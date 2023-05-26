@@ -1,4 +1,4 @@
-# Pxer 
+# Pxer
 
 <p align="left">
 	<img src="https://api.travis-ci.org/FoXZilla/Pxer.svg?branch=dev" />
@@ -17,18 +17,15 @@ Open source, free and easy to use even you are not a development. Please go [ins
 
 <img src="/public/pxer-ui.gif?raw=true" />
 
-
 ## Development
 
 1. Change your Chrome config for allow insecure in localhost
    Navigate to `chrome://flags/#allow-insecure-localhost` and set this to enabled
 1. Go project directory and run `npm install` for install dependence
-1. Run `npm run dev`  
+1. Run `npm run dev`
 1. Add 'src/local.user.js' in TamperMonkey
 1. Open some web page and you will see the run result
-
 
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
-

@@ -78,11 +78,6 @@
   ],
   [
     {
-      "src": "src/view/analytics.js"
-    }
-  ],
-  [
-    {
       "src": "src/view/AutoSuggestControl.js"
     }
   ],

@@ -30,7 +30,9 @@
     align-items: center;
 
     .pn-header {
-      a, a:active, a:hover {
+      a,
+      a:active,
+      a:hover {
         text-decoration: none;
         color: #258fb8;
         font-family: sans-serif;
@@ -111,7 +113,8 @@
       margin: 12px;
     }
 
-    .pp-filter, .pp-print {
+    .pp-filter,
+    .pp-print {
       margin-top: 1.5em;
       padding: 12px;
     }
@@ -173,7 +176,8 @@
   color: $gray-900;
   font-size: 14px;
 
-  input.form-control, select.form-control {
+  input.form-control,
+  select.form-control {
     @extend .form-control-sm;
     height: 24px;
     padding-top: 1px;
@@ -206,8 +210,6 @@
   }
 }
 
-;
-
 div#wave {
   position: relative;
   margin-left: auto;
@@ -233,7 +235,9 @@ div#wave {
 }
 
 @keyframes wave {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: initial;
   }
 

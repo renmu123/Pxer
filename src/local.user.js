@@ -17,16 +17,12 @@
 // @include        http://pxer.pea3nut.org*
 // @include        https://pxer.pea3nut.org*
 // ==/UserScript==
-javascript: void(function() {
+javascript: void (function () {
+  unsafeWindow["PXER_URL"] = "https://127.0.0.1:8125/";
+  unsafeWindow["PXER_MODE"] = "local";
+  unsafeWindow["Vue"] = Vue;
 
-    unsafeWindow['PXER_URL'] = 'https://127.0.0.1:8125/';
-    unsafeWindow['PXER_MODE'] = 'local';
-    unsafeWindow['Vue'] = Vue;
-
-    // add enter point script in page
-    document.documentElement.appendChild(
-        document.createElement('script')
-    ).src = unsafeWindow['PXER_URL'] + 'src/launcher.js?' + (+new Date);
-
-
-}());
+  // add enter point script in page
+  document.documentElement.appendChild(document.createElement("script")).src =
+    unsafeWindow["PXER_URL"] + "src/launcher.js?" + +new Date();
+})();

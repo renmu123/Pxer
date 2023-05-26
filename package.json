@@ -1,11 +1,12 @@
 {
   "name": "pxer",
-  "version": "2022.8.28",
-  "private": true,
+  "version": "7.1.0",
+  "private": false,
   "scripts": {
     "dev": "npm run build && ws --https --port 8125 --cors.origin=https://www.pixiv.net",
     "build": "node-sass src/ --output src/ && node build/build-launcher && node build/build-native && node build/build-sfp",
-    "test-build": "ws --directory dist/ --https --port 8125 --cors.origin *"
+    "test-build": "ws --directory dist/ --https --port 8125 --cors.origin *",
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "request": "^2.88.0",
@@ -15,6 +16,7 @@
     "bootstrap": "^4.3.1",
     "ejs": "^2.7.1",
     "local-web-server": "^3.0.7",
-    "node-sass": "^4.14.1"
+    "node-sass": "^4.14.1",
+    "prettier": "^2.8.8"
   }
 }
