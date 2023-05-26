@@ -251,7 +251,8 @@ class PxerApp extends PxerEvent {
         }
         parseResult.push(...result);
       }
-
+      // TODO:先走limit，再走stopId筛选逻辑
+      // 把两个筛选逻辑移动到这里来
       this.resultSet = parseResult;
       this.dispatch("finishPageTask", parseResult);
     });
