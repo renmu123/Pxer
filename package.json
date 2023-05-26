@@ -4,7 +4,7 @@
   "private": false,
   "scripts": {
     "dev": "npm run build && ws --https --port 8125 --cors.origin=https://www.pixiv.net",
-    "build": "node-sass src/ --output src/ && node build/build-launcher && node build/build-native && node build/build-sfp",
+    "build": "sass src/:src/ --no-source-map && node build/build-launcher && node build/build-native && node build/build-sfp",
     "test-build": "ws --directory dist/ --https --port 8125 --cors.origin *",
     "prettier": "prettier --write ."
   },
@@ -13,10 +13,10 @@
     "vue": "^2.6.10"
   },
   "devDependencies": {
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^4.6.2",
     "ejs": "^2.7.1",
     "local-web-server": "^3.0.7",
-    "node-sass": "^4.14.1",
+    "sass": "^1.62.1",
     "prettier": "^2.8.8"
   }
 }
