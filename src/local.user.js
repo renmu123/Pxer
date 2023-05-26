@@ -7,11 +7,11 @@
 // @icon           https://pxer-app.pea3nut.org/public/favicon.ico
 // @version        7
 // @homepageURL    https://github.com/renmu123/Pxer/
-// @supportURL     https://github.com/FoXZilla/Pxer/issues/new/choose
+// @supportURL     https://github.com/renmu123/Pxer/
 // @author         pea3nut / eternal-flame-AD
 // @grant          unsafeWindow
 // @noframes
-// @require        https://pxer-app.pea3nut.org/vue.js
+// @require        https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js
 // @include        https://www.pixiv.net*
 // @include        http://www.pixiv.net*
 // @include        http://pxer.pea3nut.org*

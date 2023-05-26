@@ -40,7 +40,7 @@ pxer.util.get = function self(data, f) {
 };
 pxer.util.addFile = async function (url) {
   const sector = url.includes("?") ? "&" : "?";
-  const pxerVersion = /*@auto-fill*/ "2022.8.28"; /*@auto-fill*/
+  const pxerVersion = /*@auto-fill*/'7.1.0'/*@auto-fill*/
 
   if (!/^(https?:)?\/\//.test(url)) url = pxer.url + url;
   url = url + sector + `pxer-version=${pxerVersion}`;
@@ -114,7 +114,9 @@ pxer.util.addFile = async function (url) {
     case "dev":
     case "master":
       // old version doesn't declare "@require vuejs"
-      await pxer.util.addFile("https://pxer-app.pea3nut.org/vue.js");
+      await pxer.util.addFile(
+        "https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"
+      );
     case "native":
       await pxer.util.addFile("native.js");
       break;

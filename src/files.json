@@ -15,7 +15,7 @@
       "src": "public/favicon.ico"
     },
     {
-      "requirePath": "https://pxer-app.pea3nut.org/vue.js"
+      "requirePath": "https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"
     },
     {
       "src": "https://point.pea3nut.org/sdk/1.0/browser.js"
