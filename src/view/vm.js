@@ -8,7 +8,6 @@ pxer.util.afterLoad(function () {
         this.taskInfo = "";
         this.errmsg = "";
         this.pageType = pxer.util.getPageType();
-        pxer.sendEvent("pv");
       },
       isRunning(value) {
         if (value && this.runTimeTimer === null) {
@@ -204,19 +203,8 @@ pxer.util.afterLoad(function () {
         this.pxer = new PxerApp();
         this.pxer.on("error", (error) => {
           this.errmsg = error;
-          pxer.sendEvent("error", {
-            error,
-            PXER_ERROR: typeof PXER_ERROR !== "undefined" ? PXER_ERROR : null,
-          });
         });
-        this.pxer.on("finishWorksTask", (result) => {
-          pxer.sendEvent("finish", {
-            result_count: result.length,
-            ptm_config: this.pxer.ptmConfig,
-            task_option: this.pxer.taskOption,
-            error_count: this.pxer.failList.length,
-          });
-        });
+        this.pxer.on("finishWorksTask", (result) => {});
       },
       crawlDirectly() {
         this.createPxerApp();
@@ -226,9 +214,6 @@ pxer.util.afterLoad(function () {
           this.state = "standby";
         });
         this.pxer.getThis();
-        pxer.sendEvent("get-this", {
-          page_type: this.pxer.pageType,
-        });
       },
 
       load() {
@@ -238,16 +223,8 @@ pxer.util.afterLoad(function () {
         this.pxer.on("finishWorksTask", () => {
           window.blinkTitle();
         });
-        pxer.sendEvent("load", {
-          page_type: this.pxer.pageType,
-        });
       },
       run() {
-        pxer.sendEvent("start", {
-          ptm_config: this.pxer.ptmConfig,
-          task_option: this.pxer.taskOption,
-          vm_state: this.state,
-        });
         if (this.state === "ready") {
           this.state = "page";
           this.pxer.initPageTask();
@@ -272,10 +249,6 @@ pxer.util.afterLoad(function () {
       stop() {
         this.state = "stop";
         this.pxer.stop();
-        pxer.sendEvent("halt", {
-          task_count: this.taskCount,
-          finish_count: this.finishCount,
-        });
       },
       count() {
         this.taskInfo = this.pxer.getWorksInfo();
@@ -288,17 +261,10 @@ pxer.util.afterLoad(function () {
             ? this.pxer.pfConfig[key].length
             : this.pxer.pfConfig[key];
         }
-        pxer.sendEvent("print", {
-          pp_config: this.pxer.ppConfig,
-          pf_config: sanitizedpfConfig,
-          task_option: this.pxer.taskOption,
-        });
       },
       useTaskOption() {
         this.showTaskOption = false;
-        pxer.sendEvent("setTaskOption", {
-          task_option: this.taskOption,
-        });
+
         Object.assign(this.pxer.taskOption, this.taskOption);
       },
       formatFailType(type) {
@@ -328,9 +294,7 @@ pxer.util.afterLoad(function () {
       },
       tryCheckedPfi() {
         this.tryFailWroksList.push(...this.checkedFailWorksList);
-        pxer.sendEvent("reready", {
-          checked_works: this.checkedFailWorksList,
-        });
+
         this.checkedFailWorksList = [];
         this.state = "re-ready";
       },
@@ -398,7 +362,6 @@ pxer.util.afterLoad(function () {
     mounted() {
       this.listenUrlChange();
       pxer.loaded = true;
-      pxer.sendEvent("pv");
     },
   };
 

@@ -6,7 +6,7 @@
 // @description:ja-JP Pixiv の全てのツールで一番使いやすいバッチキャプチャーソフトかもしれない
 // @icon           https://pxer-app.pea3nut.org/public/favicon.ico
 // @version        7
-// @homepageURL    http://pxer.pea3nut.org/
+// @homepageURL    https://github.com/renmu123/Pxer/
 // @supportURL     https://github.com/FoXZilla/Pxer/issues/new/choose
 // @author         pea3nut / eternal-flame-AD
 // @grant          unsafeWindow
