@@ -219,7 +219,11 @@ pxer.util.afterLoad(function () {
       load() {
         this.createPxerApp();
         this.state = "init";
-        this.pxer.init().then(() => (this.state = "ready"));
+        this.pxer
+          .init({
+            isQuick: true,
+          })
+          .then(() => (this.state = "ready"));
         this.pxer.on("finishWorksTask", () => {
           window.blinkTitle();
         });

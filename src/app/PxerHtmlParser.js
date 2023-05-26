@@ -196,7 +196,12 @@ PxerHtmlParser.parsePage = function (task) {
  * @param {PxerWorksRequest} task - 抓取后的页码任务对象
  * @return {PxerWorks} - 解析得到的作品任务对象
  * */
-PxerHtmlParser.parseWorks = function (task) {
+PxerHtmlParser.parseWorks = function (
+  task,
+  options = {
+    isQuick: false,
+  }
+) {
   if (!(task instanceof PxerWorksRequest)) {
     window["PXER_ERROR"] =
       "PxerHtmlParser.parseWorks: task is not PxerWorksRequest";
@@ -208,22 +213,72 @@ PxerHtmlParser.parseWorks = function (task) {
   }
 
   for (let url in task.html) {
-    let data = {
-      dom: PxerHtmlParser.HTMLParser(task.html[url]),
-      task: task,
-    };
-    try {
-      var pw = PxerHtmlParser.parseMediumHtml(data);
-    } catch (e) {
-      pxer.log(`Error in parsing task of`, task);
-      pxer.log(e);
-      window["PXER_ERROR"] = `${task.id}:${e.message}`;
-      if (window["PXER_MODE"] === "dev") console.error(task, e);
-      return false;
-    }
-  }
+    if (options.isQuick) {
+      let works = Object.entries(JSON.parse(task.html[url]).body.works);
+      works = works.map(([id, work]) => {
+        work.tags = {
+          tags: work.tags.map((tag) => {
+            return {
+              tag,
+            };
+          }),
+        };
+        work.viewCount = work.viewCount ?? 100000000;
+        work.bookmarkCount = work.bookmarkCount ?? 100000000;
+        work.urls = {
+          original: work.url.replace("_square1200", ""),
+        };
+        let tsk = new PxerWorksRequest({
+          html: {
+            [`https://www.pixiv.net/ajax/illust/${id}`]: JSON.stringify({
+              body: work,
+            }),
+          },
+          type: null,
+          isMultiple: null,
+          id: id,
+          completed: true,
+        });
+        return tsk;
+      });
+      // console.log(works);
+      const pw = [];
 
-  return pw;
+      for (let work of works) {
+        let data = {
+          dom: "",
+          task: work,
+        };
+        try {
+          pw.push(PxerHtmlParser.parseMediumHtml(data));
+        } catch (e) {
+          pxer.log(`Error in parsing task of`, task);
+          pxer.log(e);
+          window["PXER_ERROR"] = `${task.id}:${e.message}`;
+          if (window["PXER_MODE"] === "dev") console.error(task, e);
+          continue;
+        }
+      }
+      console.log(pw);
+      return pw;
+    } else {
+      let data = {
+        dom: PxerHtmlParser.HTMLParser(task.html[url]),
+        task: task,
+      };
+      console.log(data);
+      try {
+        var pw = PxerHtmlParser.parseMediumHtml(data);
+      } catch (e) {
+        pxer.log(`Error in parsing task of`, task);
+        pxer.log(e);
+        window["PXER_ERROR"] = `${task.id}:${e.message}`;
+        if (window["PXER_MODE"] === "dev") console.error(task, e);
+        return false;
+      }
+    }
+    return pw;
+  }
 };
 
 /**

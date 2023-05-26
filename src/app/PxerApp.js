@@ -77,6 +77,12 @@ class PxerApp extends PxerEvent {
       retry: 3,
       thread: 2,
     };
+
+    // pxer整体配置
+    this.options = {
+      isQuick: false,
+    };
+
     this.ppConfig = this.pageType.startsWith("works_")
       ? PxerPrinter.printAllConfig()
       : PxerPrinter.defaultConfig(); //PxerPrinter
@@ -105,7 +111,8 @@ class PxerApp extends PxerEvent {
   /**
    * 初始化时的耗时任务
    */
-  async init() {
+  async init(options) {
+    this.options = Object.assign(this.options, options);
     this.worksNum = await PxerApp.getWorksNum(document);
   }
 
@@ -302,14 +309,19 @@ class PxerApp extends PxerEvent {
 
     ptm.on("load", () => {
       this.resultSet = [];
-      var tl = this.taskList.slice(
-        //限制结果集条数
-        0,
-        this.taskOption.limit ? this.taskOption.limit : undefined
-      );
+
+      let tl = this.taskList;
+      if (!this.options.isQuick) {
+        tl = this.taskList.slice(
+          //限制结果集条数
+          0,
+          this.taskOption.limit ? this.taskOption.limit : undefined
+        );
+      }
+
       for (let pwr of tl) {
         if (!pwr.completed) continue; //跳过未完成的任务
-        let pw = PxerHtmlParser.parseWorks(pwr);
+        let pw = PxerHtmlParser.parseWorks(pwr, this.options);
         if (!pw) {
           pwr.completed = false;
           ptm.dispatch(
@@ -323,13 +335,35 @@ class PxerApp extends PxerEvent {
           this.dispatch("error", window["PXER_ERROR"]);
           continue;
         }
-        this.resultSet.push(pw);
+        if (this.options.isQuick) {
+          this.resultSet.push(...pw);
+        } else {
+          this.resultSet.push(pw);
+        }
       }
       this.dispatch("finishWorksTask", this.resultSet);
     });
     ptm.on("fail", (pfi) => {
       this.failList.push(pfi);
     });
+
+    if (this.options.isQuick) {
+      tasks = pxer.util.chunk(tasks, 30).map((chunk) => {
+        let tsk = new PxerWorksRequest({
+          html: {},
+          type: null,
+          isMultiple: null,
+          id: chunk[0].id,
+        });
+        tsk.url = [
+          `https://www.pixiv.net/ajax/user/7356311/profile/illusts?${chunk
+            .map((c) => `ids[]=${c.id}&`)
+            .join("")}work_category=illustManga&is_first_page=0`,
+        ];
+        return tsk;
+      });
+      this.taskList = tasks;
+    }
     ptm.init(tasks);
     ptm.run();
 
@@ -416,7 +450,7 @@ PxerApp.prototype["getThis"] = async function () {
  * @param {Document=document} dom - 页面的document对象
  * @return {number} - 作品数
  * */
-PxerApp.getWorksNum = function (dom = document) {
+PxerApp.getWorksNum = function async(dom = document) {
   return new Promise((resolve, reject) => {
     const pageType = pxer.util.getPageType(dom);
 

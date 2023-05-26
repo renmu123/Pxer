@@ -38,9 +38,15 @@ pxer.util.get = function self(data, f) {
     return "";
   }
 };
+pxer.util.chunk = function self(data, chunkSize) {
+  let R = [];
+  for (let i = 0; i < data.length; i += chunkSize)
+    R.push(data.slice(i, i + chunkSize));
+  return R;
+};
 pxer.util.addFile = async function (url) {
   const sector = url.includes("?") ? "&" : "?";
-  const pxerVersion = /*@auto-fill*/'7.1.0'/*@auto-fill*/
+  const pxerVersion = /*@auto-fill*/ "7.1.0"; /*@auto-fill*/
 
   if (!/^(https?:)?\/\//.test(url)) url = pxer.url + url;
   url = url + sector + `pxer-version=${pxerVersion}`;
