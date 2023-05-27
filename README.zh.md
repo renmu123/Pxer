@@ -1,3 +1,14 @@
+# 说明
+
+此项目 fork 自[Pxer](https://github.com/FoXZilla/Pxer)，我对代码做了额外更新。
+
+# 版本更新
+
+停止向原作者服务器发送统计代码
+禁止依赖原作者服务器的 vue
+油猴脚本禁止远程加载
+新增快速模式作品的解析从访问详情页修改为调用列表页，速度约加快 20 倍，减小对 pixiv 服务器的压力。
+
 # Pxer
 
 <p align="left">
@@ -8,12 +19,6 @@
 	<img src="https://img.shields.io/badge/jQuery-No-red.svg" />
 	<img src="https://img.shields.io/github/license/pea3nut/Pxer" />
 </p>
-
-> [中文文档](/README.zh.md) | [English](/README.md)
-
-纯客户端 JavaScript 编写的 [pixiv.net](https://www.pixiv.net) 爬虫工具，日均万级 PV！
-
-开源免费，易于使用，非开发者也可简单安装使用。请前往[安装页面](http://pxer.pea3nut.org/install)进行安装使用！
 
 <img src="/public/pxer-ui.gif?raw=true" />
 

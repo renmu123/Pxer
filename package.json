@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npm run build && ws --https --port 18125 --cors.origin=https://www.pixiv.net",
     "build": "sass src/:src/ --no-source-map && node build/build-launcher && node build/build-native && node build/build-sfp",
-    "test-build": "ws --directory dist/ --https --port 8125 --cors.origin *",
+    "test-build": "ws --directory dist/ --https --port 18125 --cors.origin *",
     "prettier": "prettier --write ."
   },
   "dependencies": {
