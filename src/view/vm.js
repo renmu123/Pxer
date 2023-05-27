@@ -49,6 +49,7 @@ pxer.util.afterLoad(function () {
         taskOption: {
           limit: "",
           stopId: "",
+          isQuick: true,
         },
         showLoadBtn: true,
         errmsg: "",
@@ -74,8 +75,12 @@ pxer.util.afterLoad(function () {
       taskCount() {
         if (!this.pxer) return null;
         var pageWorkCount = getOnePageWorkCount(this.pxer.pageType);
-        return Math.ceil(this.worksNum / pageWorkCount) + +this.worksNum;
+
+        // return Math.ceil(this.worksNum / pageWorkCount) + +this.worksNum;
+        // 不知道为什么要加上这一段，先注释了吧Math.ceil(this.worksNum / pageWorkCount)
+        return +this.worksNum;
       },
+      // TODO:这里需要修改
       finishCount() {
         if (this.state === "page") {
           return this.pxer.taskList.filter((pr) => pr.completed).length;

@@ -196,12 +196,7 @@ PxerHtmlParser.parsePage = function (task) {
  * @param {PxerWorksRequest} task - 抓取后的页码任务对象
  * @return {PxerWorks} - 解析得到的作品任务对象
  * */
-PxerHtmlParser.parseWorks = function (
-  task,
-  options = {
-    isQuick: false,
-  }
-) {
+PxerHtmlParser.parseWorks = function (task, options) {
   if (!(task instanceof PxerWorksRequest)) {
     window["PXER_ERROR"] =
       "PxerHtmlParser.parseWorks: task is not PxerWorksRequest";
@@ -241,7 +236,6 @@ PxerHtmlParser.parseWorks = function (
         });
         return tsk;
       });
-      // console.log(works);
       const pw = [];
 
       for (let work of works) {
@@ -259,14 +253,12 @@ PxerHtmlParser.parseWorks = function (
           continue;
         }
       }
-      console.log(pw);
       return pw;
     } else {
       let data = {
         dom: PxerHtmlParser.HTMLParser(task.html[url]),
         task: task,
       };
-      console.log(data);
       try {
         var pw = PxerHtmlParser.parseMediumHtml(data);
       } catch (e) {

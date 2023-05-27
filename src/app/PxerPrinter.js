@@ -1,5 +1,7 @@
 ﻿class PxerPrinter {
-  constructor(config) {
+  constructor(config, taskOption) {
+    this.taskOption = taskOption;
+
     /**
      * 计算得到的下载地址
      * @type {string[]}
@@ -51,7 +53,11 @@ PxerPrinter.prototype["fillAddress"] = function (worksList) {
       throw new Error(`PxerPrinter.fillAddress: ${configKey} in not in config`);
     if (this.config[configKey] === "no") continue;
     this.address.push(
-      ...PxerPrinter.countAddress(works, this.config[configKey])
+      ...PxerPrinter.countAddress(
+        works,
+        this.taskOption,
+        this.config[configKey]
+      )
     );
   }
 };
@@ -319,7 +325,7 @@ PxerPrinter.printAllConfig = function () {
  * @param {string} [type] - 拼装类型 [max|600p]
  * @return {Array}
  * */
-PxerPrinter.getUgoira = function (works, type = "max") {
+PxerPrinter.getUgoira = function (works, taskOption, type = "max") {
   const tpl = {
     max: "https://#domain#/img-zip-ugoira/img/#date#/#id#_ugoira1920x1080.zip",
     "600p": "https://#domain#/img-zip-ugoira/img/#date#/#id#_ugoira600x600.zip",
@@ -340,7 +346,7 @@ PxerPrinter.getUgoira = function (works, type = "max") {
  * @param {string} [type] - 拼装类型 [max|1200p|cover_600p]
  * @return {Array}
  * */
-PxerPrinter.getMultiple = function (works, type = "max") {
+PxerPrinter.getMultiple = function (works, taskOption, type = "max") {
   const tpl = {
     max: "https://#domain#/img-original/img/#date#/#id#_p#index#.#fileFormat#",
     "1200p":
@@ -349,21 +355,52 @@ PxerPrinter.getMultiple = function (works, type = "max") {
       "https://#domain#/c/600x600/img-master/img/#date#/#id#_p0_master1200.jpg",
   };
 
-  var address = tpl[type];
-  if (!address)
-    throw new Error(`PxerPrint.getMultiple: unknown type "${type}"`);
+  if (taskOption.isQuick) {
+    let address = tpl[type];
+    if (!address)
+      throw new Error(`PxerPrint.getMultiple: unknown type "${type}"`);
 
-  for (let key in works) {
-    address = address.replace(`#${key}#`, works[key]);
+    // 由于不知道是jpg还是png，所以要渲染两次
+    works["fileFormat"] = "jpg";
+    for (let key in works) {
+      address = address.replace(`#${key}#`, works[key]);
+    }
+    //渲染多张
+    var addressList1 = [];
+    for (let i = 0; i < works.multiple; i++) {
+      addressList1.push(address.replace("#index#", i));
+    }
+
+    address = tpl[type];
+    works["fileFormat"] = "png";
+    for (let key in works) {
+      address = address.replace(`#${key}#`, works[key]);
+    }
+    //渲染多张
+    var addressList2 = [];
+    for (let i = 0; i < works.multiple; i++) {
+      addressList2.push(address.replace("#index#", i));
+    }
+
+    console.log([...addressList1, ...addressList2]);
+    return [...addressList1, ...addressList2];
+  } else {
+    let address = tpl[type];
+    if (!address)
+      throw new Error(`PxerPrint.getMultiple: unknown type "${type}"`);
+
+    for (let key in works) {
+      address = address.replace(`#${key}#`, works[key]);
+    }
+
+    //渲染多张
+    var addressList = [];
+    for (let i = 0; i < works.multiple; i++) {
+      addressList.push(address.replace("#index#", i));
+    }
+
+    return addressList;
   }
-
-  //渲染多张
-  var addressList = [];
-  for (let i = 0; i < works.multiple; i++) {
-    addressList.push(address.replace("#index#", i));
-  }
-
-  return addressList;
 };
 /**
  * 拼装单副原始地址
@@ -371,21 +408,43 @@ PxerPrinter.getMultiple = function (works, type = "max") {
  * @param {string=max} [type] - 拼装类型 [max|600p]
  * @return {Array}
  * */
-PxerPrinter.getWorks = function (works, type = "max") {
+PxerPrinter.getWorks = function (works, taskOption, type = "max") {
   const tpl = {
     max: "https://#domain#/img-original/img/#date#/#id#_p0.#fileFormat#",
     "600p":
       "https://#domain#/c/600x600/img-master/img/#date#/#id#_p0_master1200.jpg",
   };
+  if (taskOption.isQuick) {
+    const addressList = [];
+    var addressTemplate = tpl[type];
+    if (!addressTemplate)
+      throw new Error(`PxerPrint.getWorks: unknown type "${type}"`);
 
-  var address = tpl[type];
-  if (!address) throw new Error(`PxerPrint.getWorks: unknown type "${type}"`);
+    works["fileFormat"] = "jpg";
+    let address = addressTemplate;
+    for (let key in works) {
+      address = address.replace(`#${key}#`, works[key]);
+    }
+    addressList.push(address);
 
-  for (let key in works) {
-    address = address.replace(`#${key}#`, works[key]);
+    works["fileFormat"] = "png";
+    address = addressTemplate;
+    for (let key in works) {
+      address = address.replace(`#${key}#`, works[key]);
+    }
+    addressList.push(address);
+
+    return addressList;
+  } else {
+    let address = tpl[type];
+    if (!address) throw new Error(`PxerPrint.getWorks: unknown type "${type}"`);
+
+    for (let key in works) {
+      address = address.replace(`#${key}#`, works[key]);
+    }
+
+    return [address];
   }
-
-  return [address];
 };
 /**
  * 智能拼装原始地址，对上述的简单封装
@@ -393,7 +452,7 @@ PxerPrinter.getWorks = function (works, type = "max") {
  * @param {...arguments} [argn]
  * @return {Array}
  * */
-PxerPrinter.countAddress = function (works, argn) {
+PxerPrinter.countAddress = function (works, taskOption, argn) {
   switch (true) {
     case works.type === "ugoira":
       return PxerPrinter.getUgoira(...arguments);

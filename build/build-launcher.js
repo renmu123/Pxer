@@ -9,7 +9,7 @@ Fs.writeFileSync(
     launcherFile,
     Fs.readFileSync(launcherFile).toString().replace(
         /\/\*@auto-fill\*\/.+?\/\*@auto-fill\*\//,
-        `/*@auto-fill*/'${Package.version}'/*@auto-fill*/`
+        `/*@auto-fill*/"${Package.version}"/*@auto-fill*/`
     ),
 );
 

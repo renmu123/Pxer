@@ -68,6 +68,7 @@ class PxerApp extends PxerEvent {
       limit: null,
       /**遇到id为x的作品停止后续，不包括本id*/
       stopId: null,
+      isQuick: true,
     };
 
     // 其他对象的配置参数
@@ -76,11 +77,6 @@ class PxerApp extends PxerEvent {
       timeout: 5000,
       retry: 3,
       thread: 2,
-    };
-
-    // pxer整体配置
-    this.options = {
-      isQuick: false,
     };
 
     this.ppConfig = this.pageType.startsWith("works_")
@@ -111,8 +107,7 @@ class PxerApp extends PxerEvent {
   /**
    * 初始化时的耗时任务
    */
-  async init(options) {
-    this.options = Object.assign(this.options, options);
+  async init() {
     this.worksNum = await PxerApp.getWorksNum(document);
   }
 
@@ -251,16 +246,29 @@ class PxerApp extends PxerEvent {
         }
         parseResult.push(...result);
       }
-      // TODO:先走limit，再走stopId筛选逻辑
-      // 把两个筛选逻辑移动到这里来
-      this.resultSet = parseResult;
-      this.dispatch("finishPageTask", parseResult);
+      this.resultSet = this.filterWorks(parseResult);
+
+      this.dispatch("finishPageTask", this.resultSet);
     });
     ptm.on("fail", (pfi) => {
       ptm.pointer--; //失败就不停的尝试
     });
     ptm.init(this.taskList);
     ptm.run();
+  }
+
+  // 作品筛选
+  filterWorks(parseResult = this.resultSet) {
+    let data = parseResult;
+    if (this.taskOption.limit) {
+      data = data.slice(0, this.taskOption.limit);
+    }
+    if (this.taskOption.stopId) {
+      data = data.filter((item) => item.id > this.taskOption.stopId);
+    }
+
+    this.worksNum = data.length;
+    return data;
   }
 
   /**
@@ -292,27 +300,12 @@ class PxerApp extends PxerEvent {
     var ptm = (this.ptm = new PxerThreadManager(this.ptmConfig));
     ptm.on("error", (...argn) => this.dispatch("error", argn));
     ptm.on("warn", (...argn) => this.dispatch("error", argn));
-    // 根据taskOption添加ptm中间件
-    if (this.taskOption.limit) {
-      ptm.middleware.push((task) => {
-        return ptm.pointer < this.taskOption.limit;
-      });
-    }
-    if (this.taskOption.stopId) {
-      ptm.middleware.push((task) => {
-        if (task.id == this.taskOption.stopId) {
-          ptm.stop();
-          return false;
-        }
-        return true;
-      });
-    }
 
     ptm.on("load", () => {
       this.resultSet = [];
 
       let tl = this.taskList;
-      if (!this.options.isQuick) {
+      if (!this.taskOption.isQuick) {
         tl = this.taskList.slice(
           //限制结果集条数
           0,
@@ -322,7 +315,7 @@ class PxerApp extends PxerEvent {
 
       for (let pwr of tl) {
         if (!pwr.completed) continue; //跳过未完成的任务
-        let pw = PxerHtmlParser.parseWorks(pwr, this.options);
+        let pw = PxerHtmlParser.parseWorks(pwr, this.taskOption);
         if (!pw) {
           pwr.completed = false;
           ptm.dispatch(
@@ -336,7 +329,7 @@ class PxerApp extends PxerEvent {
           this.dispatch("error", window["PXER_ERROR"]);
           continue;
         }
-        if (this.options.isQuick) {
+        if (this.taskOption.isQuick) {
           this.resultSet.push(...pw);
         } else {
           this.resultSet.push(pw);
@@ -348,8 +341,8 @@ class PxerApp extends PxerEvent {
       this.failList.push(pfi);
     });
 
-    if (this.options.isQuick) {
-      tasks = pxer.util.chunk(tasks, 30).map((chunk) => {
+    if (this.taskOption.isQuick) {
+      tasks = pxer.util.chunk(tasks, 48).map((chunk) => {
         let tsk = new PxerWorksRequest({
           html: {},
           type: null,
@@ -390,7 +383,7 @@ class PxerApp extends PxerEvent {
    * @return {string}
    * */
   getWorksInfo() {
-    var pp = new PxerPrinter(this.ppConfig);
+    var pp = new PxerPrinter(this.ppConfig, this.taskOption);
     var pf = new PxerFilter(this.pfConfig);
     pp.fillTaskInfo(pf.filter(this.resultSet));
     return pp.taskInfo;
@@ -400,7 +393,7 @@ class PxerApp extends PxerEvent {
    * 输出抓取到的作品
    * */
   printWorks() {
-    var pp = new PxerPrinter(this.ppConfig);
+    var pp = new PxerPrinter(this.ppConfig, this.taskOption);
     var pf = new PxerFilter(this.pfConfig);
     var works = pf.filter(this.resultSet);
     pp.fillTaskInfo(works);
